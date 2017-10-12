@@ -1,0 +1,1 @@
+jar cfm FuemsCalculator.jar manifest.txt *.java *.class icon.png Packages/*.jar Backend/*.class Frontend/*.class
