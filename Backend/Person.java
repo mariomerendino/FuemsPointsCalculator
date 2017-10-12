@@ -5,7 +5,6 @@ public class Person{
     public String lName;
 
     
-    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;

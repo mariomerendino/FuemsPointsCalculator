@@ -14,12 +14,19 @@ import java.io.IOException;
 //java UI
 public class UI extends JFrame{
     FileIO io;
+    
     File selectedFile;
     JButton calculate;
     JButton openFile;
+    JButton error;
     String filePath;
     ImageIcon img;
+    JLabel points;
+    JLabel status;
+    JTextArea area;
+    JScrollPane areaScrollPane;
     public UI(){
+        io = new FileIO();
         setTitle("Fuems Point's Calculator");
         setLayout(new BorderLayout(10, 10));
         img = new ImageIcon(getClass().getResource("/icon.png"));
@@ -33,34 +40,62 @@ public class UI extends JFrame{
                 io.PrintToError("Cannot load Doc Icon.");
             }
         }
+        area = new JTextArea(20,50);
+        areaScrollPane = new JScrollPane(area);
+        areaScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        areaScrollPane.setPreferredSize(new Dimension(500, 300));
+        area.setText(" ");
+        area.setEditable(false);
         setVisible(true);
         setSize(600,400);
-    
+        add(NorthPanel(), BorderLayout.NORTH);
         add(centerPanel(), BorderLayout.CENTER);
+        add(southPanel(), BorderLayout.SOUTH);
+        
     }
-    public JPanel centerPanel(){
+    public JPanel NorthPanel(){
+        JPanel North = new JPanel();        
         openFile = new JButton("Open File");        
         calculate = new JButton("Calculate Points");
+        calculate.setVisible(false);        
         calculate.addActionListener(new ActionListener() { 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(io.getFileExtension(selectedFile) != ".csv" ||
-                 io.getFileExtension(selectedFile) != ".CSV"){ 
-                    JOptionPane.showMessageDialog(null, "You must select a CSV file", "ERROR:", JOptionPane.WARNING_MESSAGE, img); 
-                }
+                io.CalculatePoints(selectedFile.getAbsolutePath());
+                area.setText(io.GetPoints());
             }
         });
         openFile.addActionListener(new ActionListener() { 
             @Override
             public void actionPerformed(ActionEvent e) {
                 pickFile();
+                calculate.setVisible(true);
+                
             }
         });
-        JPanel center = new JPanel();
-        center.setLayout(new FlowLayout());
-        center.add(openFile);
-        center.add(calculate);
-        return center;
+        North.setLayout(new FlowLayout());
+
+        ImageIcon imageIcon = new ImageIcon(img.getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT));
+
+        JLabel icon = new JLabel();
+        icon.setIcon(imageIcon);
+        North.add(icon);
+        North.add(openFile);
+        North.add(calculate);
+        return North;
+    }
+    public JPanel southPanel(){
+        JPanel south = new JPanel();
+        error = new JButton("Error Log");
+        error.addActionListener(new ActionListener() { 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame popup = errorLog();
+            }
+        });
+        south.add(error);
+        return south;
     }
     public void pickFile(){
         JFileChooser fileChooser = new JFileChooser();
@@ -83,5 +118,23 @@ public class UI extends JFrame{
             return false;
         }
     }
-
+    public JFrame errorLog(){
+        JFrame panel = new JFrame(); 
+        panel.setTitle("Fuems Point's Calculator Error Log");
+        panel.setLayout(new BorderLayout(10, 10));
+        panel.setVisible(true);
+        panel.setSize(600,400);
+        panel.add(new Label(io.ErrorLog),BorderLayout.CENTER);
+        return panel;
+    }
+    public JPanel centerPanel(){
+        JPanel center = new JPanel();
+        center.setVisible(true);
+        
+        //JScrollPane scrollPane = new JScrollPane(area, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        center.add(areaScrollPane);
+        
+        return center;        
+    }
+    
 }
