@@ -1,3 +1,5 @@
+package Frontend;
+import Backend.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -11,22 +13,25 @@ import java.io.IOException;
 //RUN WITH
 //java UI
 public class UI extends JFrame{
+    FileIO io;
     File selectedFile;
     JButton calculate;
     JButton openFile;
     String filePath;
     ImageIcon img;
-    public static void main(String[] args){
-        UI x = new UI();
-    }
     public UI(){
         setTitle("Fuems Point's Calculator");
         setLayout(new BorderLayout(10, 10));
-        img = new ImageIcon("Images/icon.png");
+        img = new ImageIcon(getClass().getResource("/icon.png"));
         this.setIconImage(img.getImage());
         if ( exists( "com.apple.eawt.Application" ) )
         {
+            try{
             com.apple.eawt.Application.getApplication().setDockIconImage( img.getImage() );
+            }
+            catch(Exception e){
+                io.PrintToError("Cannot load Doc Icon.");
+            }
         }
         setVisible(true);
         setSize(600,400);
@@ -34,13 +39,14 @@ public class UI extends JFrame{
         add(centerPanel(), BorderLayout.CENTER);
     }
     public JPanel centerPanel(){
+        openFile = new JButton("Open File");        
         calculate = new JButton("Calculate Points");
-        openFile = new JButton("Open File");
         calculate.addActionListener(new ActionListener() { 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(selectedFile == null){
-                    JOptionPane.showMessageDialog(null, "You must select a CSV file", "ERROR:", JOptionPane.WARNING_MESSAGE); 
+                if(io.getFileExtension(selectedFile) != ".csv" ||
+                 io.getFileExtension(selectedFile) != ".CSV"){ 
+                    JOptionPane.showMessageDialog(null, "You must select a CSV file", "ERROR:", JOptionPane.WARNING_MESSAGE, img); 
                 }
             }
         });
@@ -77,4 +83,5 @@ public class UI extends JFrame{
             return false;
         }
     }
+
 }

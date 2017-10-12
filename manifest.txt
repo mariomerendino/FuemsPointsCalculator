@@ -1,1 +1,2 @@
-Main-Class: UI
+Main-Class: Start
+Class-Path: AppleJavaExtensions.jar
