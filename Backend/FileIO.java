@@ -5,7 +5,7 @@ import java.io.*;
 public class FileIO{
 
     //HashMap containing Names, and points
-    private HashMap<String, Integer> numPointsMap = new HashMap<String, Integer>();
+    private HashMap<String, Double> numPointsMap = new HashMap<String, Double>();
     //error log String
     public static String ErrorLog = "<html><br>";
     //current line Number
@@ -14,7 +14,7 @@ public class FileIO{
     //Runs through the CSV File, and adds people and points to 
     //the hashmap. 
     public void CalculatePoints(String filePath){
-        numPointsMap = new HashMap<String, Integer>();
+        numPointsMap = new HashMap<String, Double>();
         ErrorLog = "<html><br>";
         String[] s;
         String key = new String();
@@ -53,11 +53,32 @@ public class FileIO{
         }
     }
     //Used to determine the amount of points for each entry 
-    public int NumPointsForActivity(String[] line, int lineNum){
+    public double NumPointsForActivity(String[] line, int lineNum){
         String activityName = line[5];
-        int ans = 0;
+        double ans = 0;
         if(activityName.equals("Standby")){
-            ans = 1;
+            ans = .5;
+            try{
+                double numberOfHours = Double.parseDouble(line[8]);
+                ans = ans * numberOfHours;
+            }
+            catch(Exception e){
+                PrintToError("Error: Line (" + Integer.toString(lineNum) + ") Hours are not integers. Points not added" );
+                return 0;
+            }
+        }
+        else if(activityName.equals("CPR Class")){
+            ans = .5; 
+            try{
+                double numberOfHours = Double.parseDouble(line[8]);
+                ans = ans * numberOfHours;                
+            }
+            catch(Exception e){
+                PrintToError("Error: Line (" + Integer.toString(lineNum) + ") Hours are not integers. Points not added" );
+                return 0;
+            }
+        }
+        else if(activityName.equals("Driver Training")){
             try{
                 double numberOfHours = Double.parseDouble(line[8]);
                 
@@ -67,14 +88,16 @@ public class FileIO{
                 return 0;
             }
         }
-        else if(activityName.equals("CPR Class")){
-            ans = 1; 
-        }
-        else if(activityName.equals("Driver Training")){
-            ans = 1;
-        }
         else if(activityName.equals("Busy Night")){
             ans = 1;
+            try{
+                double numberOfHours = Double.parseDouble(line[8]);
+                
+            }
+            catch(Exception e){
+                PrintToError("Error: Line (" + Integer.toString(lineNum) + ") Hours are not integers. Points not added" );
+                return 0;
+            }
             
         }
         else if(activityName.equals("Over 24-Hour Shift")){
@@ -82,15 +105,16 @@ public class FileIO{
             
         }
         else if(activityName.equals("Goodwill")){
-            ans = 1;
+            ans = 0;
+
             
         }
         else if(activityName.equals("Decon")){
-            ans = 1;
+            //ans = 1;
             
         }
         else if(activityName.equals("Empress Run")){
-            ans = 1;
+            //ans = 1;
             
         }
         else{
