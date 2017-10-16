@@ -2,15 +2,23 @@ package Backend;
 
 import java.util.*;
 import java.io.*;
-public class FileIO{ 
-    public HashMap<String, Integer> numPointsMap = new HashMap<String, Integer>();
-    public String ErrorLog = "";
+public class FileIO{
+
+    //HashMap containing Names, and points
+    private HashMap<String, Integer> numPointsMap = new HashMap<String, Integer>();
+    //error log String
+    public static String ErrorLog = "<html><br>";
+    //current line Number
     private int lineNum;
+
+    //Runs through the CSV File, and adds people and points to 
+    //the hashmap. 
     public void CalculatePoints(String filePath){
+        numPointsMap = new HashMap<String, Integer>();
+        ErrorLog = "<html><br>";
         String[] s;
-        Person temp = new Person();
         String key = new String();
-        lineNum = 0;
+        lineNum = 1;
         String line; 
         try{
             BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
@@ -20,22 +28,22 @@ public class FileIO{
                 lineNum++;
                 try{
                     s = line.split(",");
-                    temp.fName = s[3];
-                    temp.lName = s[2];
-                    key = temp.fName+","+temp.lName;
+                    
+                    key = s[3]+","+s[2];
                     key = key.replaceAll("\\s","");
 
                     if(numPointsMap.containsKey(key)){
-                        numPointsMap.put(key, numPointsMap.get(key) + NumPointsForActivity(s));
+                        numPointsMap.put(key, numPointsMap.get(key) + NumPointsForActivity(s, lineNum));
 
                     }
                     else{
-                        numPointsMap.put(key, NumPointsForActivity(s));
+                        numPointsMap.put(key, NumPointsForActivity(s, lineNum));
                         
                     }
                 }
                 catch(Exception e){
-                    PrintToError("Error");
+                
+                    PrintToError("Error: line (" + Integer.toString(lineNum) + ")");
                 }
                 
             }
@@ -44,12 +52,20 @@ public class FileIO{
             PrintToError("Error Reading file");
         }
     }
-    public int NumPointsForActivity(String[] line){
+    //Used to determine the amount of points for each entry 
+    public int NumPointsForActivity(String[] line, int lineNum){
         String activityName = line[5];
-        System.out.println(activityName);
         int ans = 0;
         if(activityName.equals("Standby")){
             ans = 1;
+            try{
+                double numberOfHours = Double.parseDouble(line[8]);
+                
+            }
+            catch(Exception e){
+                PrintToError("Error: Line (" + Integer.toString(lineNum) + ") Hours are not integers. Points not added" );
+                return 0;
+            }
         }
         else if(activityName.equals("CPR Class")){
             ans = 1; 
@@ -84,6 +100,10 @@ public class FileIO{
         return ans;
     }
 
+    //Returns the total amount of points each student as a string in the format of:
+    //Name: John Smith
+    //Points: 1
+    //endl. 
     public String GetPoints(){
         String ans = "";
         String temp; 
@@ -101,13 +121,13 @@ public class FileIO{
             }
             it.remove(); 
         }
-        System.out.println(ans);
         return ans;
     }
-
+    //Print to error log.
     public void PrintToError(String message){
-        ErrorLog =  message + "\n";
+        ErrorLog =  ErrorLog + message + "<br>";
     }
+    //returns the file extention of any inputed file. 
     public String getFileExtension(File file) {
         String name = file.getName();
         try {
